@@ -19,7 +19,7 @@ class _ProductsDetailsPageState extends State<ProductsDetailsPage> {
         child: Column(
           children: [
             ElevatedButton(
-                onPressed: () => context.go('/'),
+                onPressed: () => context.go('/products'),
                 child: const Text("Ir para home")),
             OutlinedButton(
                 onPressed: () => context.go('/cart'),
