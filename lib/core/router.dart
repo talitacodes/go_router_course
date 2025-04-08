@@ -32,34 +32,47 @@ final router = GoRouter(
   },
   initialLocation: '/products',
   navigatorKey: rootNavigator,
+  //observers: [CustomObserver()],
   routes: [
-    GoRoute(path: '404', builder: (_, state) => NotFoundPage()),
+    GoRoute(
+        path: '404',
+        pageBuilder: (_, state) =>
+            CustomPage(state: state, child: NotFoundPage())),
     GoRoute(
         path: '/login',
-        builder: (_, state) => LoginPage(
-              redirectTo: state.uri.queryParameters['redirectTo'],
-            )),
+        pageBuilder: (_, state) => CustomPage(
+            state: state,
+            child: LoginPage(
+                redirectTo: state.uri.queryParameters['redirectTo']))),
     GoRoute(
         path: '/login-dialog',
         pageBuilder: (context, state) =>
             DialogPage(builder: (_) => Dialog(), barrierDismissible: false)),
     StatefulShellRoute.indexedStack(
         //Solucao para nao precisar usar pageBuilder
-        builder: (context, state, shell) => MyHomePage(shell: shell),
+        pageBuilder: (context, state, shell) =>
+            CustomPage(state: state, child: MyHomePage(shell: shell)),
         branches: [
           StatefulShellBranch(routes: [
             GoRoute(
                 path: '/products',
-                builder: (_, state) => ProductsListPage(
-                    page:
-                        int.tryParse(state.uri.queryParameters['page'] ?? '') ??
-                            0),
+                pageBuilder: (_, state) => CustomPage(
+                      state: state,
+                      child: ProductsListPage(
+                          page: int.tryParse(
+                                  state.uri.queryParameters['page'] ?? '') ??
+                              0),
+                    ),
                 routes: [
                   GoRoute(
                       path: ':id',
                       parentNavigatorKey: rootNavigator,
-                      builder: (context, state) => ProductsDetailsPage(
-                          id: int.tryParse(state.pathParameters['id']!) ?? 0),
+                      pageBuilder: (context, state) => CustomPage(
+                            state: state,
+                            child: ProductsDetailsPage(
+                                id: int.tryParse(state.pathParameters['id']!) ??
+                                    0),
+                          ),
                       onExit: (context, state) {
                         //return false; nao deixa sair
                         return true;
@@ -73,8 +86,8 @@ final router = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
                 path: '/cart',
-                pageBuilder: (context, state) => NoTransitionPage(
-                    child: CartPage()), //Tirar animacao entre as telas
+                pageBuilder: (context, state) =>
+                    CustomPage(state: state, child: CartPage()),
                 redirect: (_, state) =>
                     processGuards(state, [LoggedInRouteGuard()])),
           ]),
@@ -129,4 +142,33 @@ class PremiumUserRouteGuard implements RouteGuard {
     }
     return null;
   }
+}
+
+class CustomObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+
+    if (route.settings.arguments is GoRouterState) {
+      final state = route.settings.arguments as GoRouterState;
+      print('Pushed:  ${state.fullPath} ${state.pathParameters}');
+    }
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    print('Popped: ${route.settings.name} -> ${previousRoute?.settings.name}');
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    print('Popped: ${oldRoute?.settings.name} -> ${newRoute?.settings.name}');
+  }
+}
+
+class CustomPage extends NoTransitionPage {
+  const CustomPage({required super.child, required GoRouterState state})
+      : super(arguments: state);
 }
