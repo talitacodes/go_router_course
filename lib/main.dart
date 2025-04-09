@@ -1,10 +1,12 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router_course/core/router.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 final eventBus = EventBus();
 
 void main() {
+  setPathUrlStrategy(); //altera url sem precisar usar #, sem recarregar varias requisiçoes pro servidor
   runApp(const MyApp());
 }
 
@@ -52,7 +54,8 @@ class _RouteObserverState extends State<RouteObserver> {
 
   void _handleRouteChange() {
     if (lastRoute != null) {
-      print('$lastRoute ${routeStopwatch.elapsed}'); //Quanto tempo o usuario passou em cada tela
+      print(
+          '$lastRoute ${routeStopwatch.elapsed}'); //Quanto tempo o usuario passou em cada tela
     }
 
     routeStopwatch.reset();

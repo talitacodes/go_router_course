@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:go_router_course/core/events.dart';
+import 'package:go_router_course/core/router.dart';
 import 'package:go_router_course/main.dart';
 
 class ProductsDetailsPage extends StatefulWidget {
@@ -34,7 +35,10 @@ class _ProductsDetailsPageState extends State<ProductsDetailsPage> {
                 child: const Text("Ir para home")),
             OutlinedButton(
                 onPressed: () => context.go('/cart'),
-                child: const Text('Adicionar ao carrinho'))
+                child: const Text('Adicionar ao carrinho')),
+            ElevatedButton(
+                onPressed: () => changeRoutes(false),
+                child: const Text("Desabilitar detalhes do produto")),
           ],
         ),
       ),
